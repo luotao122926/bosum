@@ -1,0 +1,112 @@
+# Lock4j 配置项
+lock4j:
+  acquire-timeout: 3000 # 获取分布式锁超时时间，默认为 3000 毫秒
+  expire: 30000 # 分布式锁的超时时间，默认为 30 毫秒
+
+spring:
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+  redis:
+    host: 172.16.253.33 # 地址
+    port: 6379 # 端口（单元测试，使用 6379 端口）
+    database: 0 # 数据库索引
+    password: boShang@Redis
+  cloud:
+    nacos:
+      server-addr: 172.16.253.33:8858
+      discovery:
+        namespace: erp-cloud-dev # 命名空间。这里使用 dev 开发环境
+      # Nacos Config 配置项，对应 NacosConfigProperties 配置属性类
+      config:
+        server-addr: 172.16.253.33:8858 # Nacos 服务器地址
+        namespace: erp-cloud-dev # 命名空间。这里使用 dev 开发环境
+        group: erp-cloud-dev # 使用的 Nacos 配置分组，默认为 DEFAULT_GROUP
+        name: erp-gateway-dev # 使用的 Nacos 配置集的 dataId，默认为 spring.application.name
+        file-extension: yaml # 使用的 Nacos 配置集的 dataId 的文件拓展名，同时也是 Nacos 配置集的配置格式，默认为 properties
+    #网关配置服务转发
+    gateway:
+      discovery:
+        locator:
+          enabled: true      #开启根据服务名称转发
+          lower-case-service-id: true  #微服务名称以小写的名称呈现
+      #网关转发    根据服务名称转发
+      routes:
+        #旧erp的服务
+        - id: erp-service
+          uri: lb://erp-service/erp
+          predicates:
+            - Path=/erp/**
+          order: 999
+        # auth服务
+        - id: erp-auth
+          uri: lb://erp-auth
+          predicates:
+            - Path=/erp/auth/**
+          filters:
+            - RewritePath=/erp/auth/?(?<segment>.*),/auth/$\{segment}
+            - AddRequestHeader=REQUEST_SOURCE,NEW_ERP
+        # expose服务
+        - id: erp-service-expose
+          uri: lb://erp-service-expose
+          predicates:
+            - Path=/erp/expose/**
+          filters:
+            - RewritePath=/erp/expose/?(?<segment>.*),/expose/$\{segment}
+        # 订单服务
+        - id: erp-service-order
+          uri: lb://erp-service-order
+          predicates:
+            - Path=/erp/order/**
+          filters:
+            - RewritePath=/erp/order/?(?<segment>.*),/order/$\{segment}
+            - AddRequestHeader=REQUEST_SOURCE,NEW_ERP
+        # process服务
+        - id: erp-service-process
+          uri: lb://erp-service-process
+          predicates:
+            - Path=/erp/process/**
+          filters:
+            - RewritePath=/erp/process/?(?<segment>.*),/process/$\{segment}
+            - AddRequestHeader=REQUEST_SOURCE,NEW_ERP
+        # system服务
+        - id: erp-service-system
+          uri: lb://erp-service-system
+          predicates:
+            - Path=/erp/system/**
+          filters:
+            - RewritePath=/erp/system/?(?<segment>.*),/system/$\{segment}
+            - AddRequestHeader=REQUEST_SOURCE,NEW_ERP
+        # demo服务
+        - id: erp-service-demo
+          uri: lb://erp-service-demo
+          predicates:
+            - Path=/demo/**
+          filters:
+            - AddRequestHeader=REQUEST_SOURCE,NEW_ERP
+
+
+# 白名单配置规则
+whites-rules:
+  ignore:
+    # 纯粹的白名单 ，只要配置这里一律进行放行操作 优先级最高
+    common-whites:
+      url:
+        - /auth/permission/login
+        - /process/event/callback
+    # 给外部系统使用的接口 第三方系统调用erp系统的验证规则
+    expose-whites:
+      whites:
+        - /expose/feiShu/getDeptInfo
+        - /expose/feiShu/getAllDeptInfo
+        - /expose/feiShu/getUserGoodsFixedCount
+        - /expose/feiShu/getUserGoodsFixed
+        - /expose/feiShu/getStandardValue
+        - /expose/feiShu/getUserInductionDate
+        - /expose/feiShu/getUserPositionLevel
+        - /expose/feiShu/getUserPosition
+        - /expose/feiShu/getUserTeam
+        - /expose/feiShu/getTeam
+        - /process/event/callback
+    # erp系统调用第三方系统的规则配置
+    request-third-whites:
+      url:
+        - /demo/hello/erp2
