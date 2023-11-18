@@ -39,10 +39,18 @@ public class NewErpStrategyService implements Strategy {
         ServerHttpRequest.Builder mutate = request.mutate();
         String clientType = request.getHeaders().getFirst("CLIENT_TYPE");
         String token = getToken(request);
+
         if (StrUtil.isEmpty(token)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌不能为空");
         }
-        Claims claims = JwtUtils.parseToken(token);
+        Claims claims ;
+        try {
+             claims = JwtUtils.parseToken(token);
+        } catch (Exception e) {
+            log.error("解析token错误", e);
+            return RespUtils.unauthorizedResponse(exchange, "token不对，请重新登录");
+
+        }
 
         if (claims == null) {
             return RespUtils.unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
