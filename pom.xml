@@ -234,6 +234,19 @@
         </pluginManagement>
 
         <plugins>
+            <!-- 打包 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.7</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal> <!-- 将引入的 jar 打入其中 -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
