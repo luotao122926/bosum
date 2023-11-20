@@ -2,6 +2,8 @@ server:
   port: 8010
 # spring
 spring:
+  codec:
+    max-in-memory-size: 1048576
   application:
     name: erp-gateway
   main:
