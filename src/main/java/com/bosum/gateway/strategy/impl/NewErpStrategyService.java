@@ -3,6 +3,7 @@ package com.bosum.gateway.strategy.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.json.JSONUtil;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.framework.common.constants.TokenConstants;
 import com.bosum.framework.common.util.jwt.JwtUtils;
@@ -44,6 +45,8 @@ public class NewErpStrategyService implements Strategy {
         String token = getToken(request);
         log.info("请求头的信息的token {}", token);
         log.info("请求客户端clientType: {}", clientType);
+
+        log.info("请求头信息: {}", JSONUtil.toJsonStr(request.getHeaders()));
 
         if (StrUtil.isEmpty(token)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌不能为空");
@@ -120,5 +123,8 @@ public class NewErpStrategyService implements Strategy {
             token = token.replaceFirst(TokenConstants.PREFIX, StrUtil.EMPTY);
         }
         return token;
+
+
+
     }
 }
