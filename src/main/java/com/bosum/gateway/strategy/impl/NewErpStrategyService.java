@@ -18,8 +18,11 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 /**
  * 具体策略（ConcreteStrategy）：具体策略是实现策略接口的类。
@@ -39,6 +42,7 @@ public class NewErpStrategyService implements Strategy {
         ServerHttpRequest.Builder mutate = request.mutate();
         String clientType = request.getHeaders().getFirst("CLIENT_TYPE");
         String token = getToken(request);
+        log.info("请求头的信息的token {}", token);
 
         if (StrUtil.isEmpty(token)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌不能为空");
@@ -56,7 +60,9 @@ public class NewErpStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
         String userid = JwtUtils.getUserId(claims);
+        log.info("从redis获取token的信息 {}", getTokenKey(userid,clientType));
         boolean isLogin = Boolean.TRUE.equals(redisTemplate.hasKey(getTokenKey(userid,clientType)));
+        log.info("isLogin {}", isLogin);
         if (!isLogin) {
             return RespUtils.unauthorizedResponse(exchange, "登录状态已过期");
         }
