@@ -1,7 +1,8 @@
 server:
   port: 8010
   tomcat:
-    max-http-form-post-size: 100MB
+    max-http-form-post-size: 60MB
+  max-http-header-size: 60MB
 # spring
 spring:
   codec:
