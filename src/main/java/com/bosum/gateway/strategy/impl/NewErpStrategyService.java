@@ -41,7 +41,7 @@ public class NewErpStrategyService implements Strategy {
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
-        String clientType = request.getHeaders().getFirst("CLIENT_TYPE");
+        String clientType = request.getHeaders().getFirst("Clienttype");
         String token = getToken(request);
         log.info("请求头的信息的token {}", token);
         log.info("请求客户端clientType: {}", clientType);
