@@ -1,14 +1,25 @@
-spring:
-  application:
-    name: erp-gateway-service
-
-  profiles:
-    active: dev
-
 server:
   port: 8010
+# spring
+spring:
+  application:
+    name: erp-gateway
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: @nacos.config.active@
 
-# 日志文件配置。注意，如果 logging.file.name 不放在 bootstrap.yaml 配置文件，而是放在 application-local.yaml 中，会导致出现 LOG_FILE_IS_UNDEFINED 文件
-logging:
-  file:
-    name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
+#项目名
+---
+# nacos
+spring:
+  cloud:
+    nacos:
+      server-addr: @nacos.server@
+      config:
+        group: @nacos.config.group@
+        namespace: @nacos.config.namespace@
+        file-extension: yaml
+      discovery:
+        namespace: @nacos.config.namespace@
+
