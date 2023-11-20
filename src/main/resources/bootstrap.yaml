@@ -1,5 +1,7 @@
 server:
   port: 8010
+  tomcat:
+    max-http-form-post-size: 100
 # spring
 spring:
   codec:
