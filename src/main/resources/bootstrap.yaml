@@ -20,10 +20,6 @@ spring:
         group: @nacos.config.group@
         namespace: @nacos.config.namespace@
         file-extension: yaml
-        shared-configs:
-          - data-id: application-common.yaml
-            group: @nacos.config.group@
-            refresh: true
       discovery:
         namespace: @nacos.config.namespace@
 
