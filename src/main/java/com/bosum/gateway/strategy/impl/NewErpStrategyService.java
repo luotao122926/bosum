@@ -43,6 +43,7 @@ public class NewErpStrategyService implements Strategy {
         String clientType = request.getHeaders().getFirst("CLIENT_TYPE");
         String token = getToken(request);
         log.info("请求头的信息的token {}", token);
+        log.info("请求客户端clientType: {}", clientType);
 
         if (StrUtil.isEmpty(token)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌不能为空");
