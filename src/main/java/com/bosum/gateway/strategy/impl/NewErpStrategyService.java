@@ -102,7 +102,7 @@ public class NewErpStrategyService implements Strategy {
 
     private void removeHeader(ServerHttpRequest.Builder mutate) {
         mutate.headers(httpHeaders -> httpHeaders.remove(SecurityConstants.REQUEST_SOURCE)).build();
-        mutate.headers(httpHeaders -> httpHeaders.remove("USER_ID")).build();
+        mutate.headers(httpHeaders -> httpHeaders.remove("userId")).build();
     }
 
 
