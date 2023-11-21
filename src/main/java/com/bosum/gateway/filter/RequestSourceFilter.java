@@ -35,6 +35,9 @@ public class RequestSourceFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         // 首先各种策略模式是否满足条件
         String requestSource = request.getHeaders().getFirst("Requestsource");
+        // 新系统标识
+        String identifying = request.getHeaders().getFirst("Identifying");
+
         RequestSourceEnum requestSourceEnum = null;
         String url = request.getURI().getPath();
         log.info("请求url为: {}", url);
@@ -54,10 +57,11 @@ public class RequestSourceFilter implements GlobalFilter, Ordered {
         if (StrUtil.isEmpty(requestSource)) {
             return chain.filter(exchange);
         }
+        if(RequestSourceEnum.NEW_ERP.getType().equals(identifying)){
+            requestSourceEnum = RequestSourceEnum.NEW_ERP;
+        }
         if (RequestSourceEnum.INNER.getType().equals(requestSource)) {
             requestSourceEnum = RequestSourceEnum.INNER;
-        }else if(RequestSourceEnum.NEW_ERP.getType().equals(requestSource)){
-            requestSourceEnum = RequestSourceEnum.NEW_ERP;
         }
         return requestMethodStrategyContext.check(requestSourceEnum, exchange, chain);
     }
