@@ -34,7 +34,7 @@ public class RequestSourceFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         // 首先各种策略模式是否满足条件
-        String requestSource = request.getHeaders().getFirst("requestSource");
+        String requestSource = request.getHeaders().getFirst("Request-Source");
         RequestSourceEnum requestSourceEnum = null;
         String url = request.getURI().getPath();
         log.info("请求url为: {}", url);

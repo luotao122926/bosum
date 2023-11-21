@@ -36,7 +36,7 @@ public class InnerStrategyService implements Strategy {
         //要判断是否是新的erp2接口
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
-        String userId = request.getHeaders().getFirst("userId");
+        String userId = request.getHeaders().getFirst("User-Id");
         if (StrUtil.isNotEmpty(userId)) {
             try {
                 //  远程调用老erp服务获取对应的用户信息 并且存放到请求头
