@@ -54,7 +54,7 @@ public class RequestSourceFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
         // 旧系统直接放行
-        if (StrUtil.isEmpty(requestSource)) {
+        if (StrUtil.isEmpty(requestSource) && StrUtil.isEmpty(identifying)) {
             return chain.filter(exchange);
         }
         if(RequestSourceEnum.NEW_ERP.getType().equals(identifying)){
