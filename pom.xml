@@ -131,8 +131,8 @@
             <id>dev</id>
             <properties>
                 <nacos.server>172.16.253.33:8858</nacos.server>
-                <nacos.config.group>erp-cloud-dev</nacos.config.group>
-                <nacos.config.namespace>erp-cloud-dev</nacos.config.namespace>
+                <nacos.config.group>erp-dev</nacos.config.group>
+                <nacos.config.namespace>erp-dev</nacos.config.namespace>
                 <nacos.config.active>dev</nacos.config.active>
             </properties>
             <activation>
