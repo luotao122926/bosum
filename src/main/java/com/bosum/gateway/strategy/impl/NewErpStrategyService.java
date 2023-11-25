@@ -19,11 +19,8 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * 具体策略（ConcreteStrategy）：具体策略是实现策略接口的类。
