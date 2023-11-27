@@ -1,7 +1,7 @@
 package com.bosum.gateway.util;
 
 import cn.hutool.json.JSONUtil;
-import com.bosum.framework.common.pojo.CommonResult;
+import com.bosum.framework.common.core.ResultData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -18,9 +18,9 @@ public class RespUtils {
     public static Mono<Void> unauthorizedResponse(ServerWebExchange exchange, String msg) {
         log.error("[鉴权异常处理]请求路径:{}", exchange.getRequest().getPath());
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        CommonResult<?> result = CommonResult.error(401, msg);
+        ResultData<?> result = new ResultData<>(5005,msg);
         DataBuffer dataBuffer = response.bufferFactory().wrap(JSONUtil.toJsonPrettyStr(result).getBytes());
         return response.writeWith(Mono.just(dataBuffer));
     }
