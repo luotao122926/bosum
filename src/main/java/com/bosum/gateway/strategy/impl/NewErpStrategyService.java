@@ -72,6 +72,7 @@ public class NewErpStrategyService implements Strategy {
         String manager = JwtUtils.getUserManger(claims);
         String userSuper = JwtUtils.getUserSuper(claims);
         String feishuOpenId = JwtUtils.getFeishuOpenId(claims);
+        String deptId = JwtUtils.getDeptId(claims);
         if (StrUtil.isEmpty(userid) || StrUtil.isEmpty(username)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌验证失败");
         }
@@ -82,6 +83,7 @@ public class NewErpStrategyService implements Strategy {
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_MANAGER, manager);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_SUPER, userSuper);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, feishuOpenId);
+        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, deptId);
         // 从redis获取
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, redisTemplate.opsForValue().get(SecurityConstants.NEW_ERP_DEPT_ID_LIST + userid));
         // 内部请求来源参数清除
