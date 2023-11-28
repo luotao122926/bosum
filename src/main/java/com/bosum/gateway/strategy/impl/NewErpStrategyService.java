@@ -17,6 +17,7 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -35,7 +36,7 @@ import reactor.core.publisher.Mono;
 public class NewErpStrategyService implements Strategy {
 
 
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String,Object> redisTemplate;
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
