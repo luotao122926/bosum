@@ -14,6 +14,10 @@ public class UserDeptIdsVO {
 
     private String userCode;
 
+    private String feiShuOpenId;
+
+    private String deptId;
+
     private String superManager;
 
     private String manager;

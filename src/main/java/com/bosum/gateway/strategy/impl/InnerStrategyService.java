@@ -48,6 +48,8 @@ public class InnerStrategyService implements Strategy {
                     WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_MANAGER, userInfo.getManager());
                     WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_SUPER, userInfo.getSuperManager());
                     WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, userInfo.getDeptAuthList());
+                    WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, userInfo.getDeptId());
+                    WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, userInfo.getFeiShuOpenId());
                 }
             } catch (Exception e) {
                 log.error("调用接口失败 ",e);
