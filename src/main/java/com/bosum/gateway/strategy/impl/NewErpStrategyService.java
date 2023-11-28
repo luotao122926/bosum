@@ -1,9 +1,11 @@
 package com.bosum.gateway.strategy.impl;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.framework.common.constants.TokenConstants;
 import com.bosum.framework.common.util.jwt.JwtUtils;
@@ -33,7 +35,7 @@ import reactor.core.publisher.Mono;
 public class NewErpStrategyService implements Strategy {
 
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate redisTemplate;
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -85,7 +87,12 @@ public class NewErpStrategyService implements Strategy {
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, feishuOpenId);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, deptId);
         // 从redis获取
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, redisTemplate.opsForValue().get(SecurityConstants.NEW_ERP_DEPT_ID_LIST + userid));
+        Object deptList = redisTemplate.opsForValue().get(SecurityConstants.NEW_ERP_DEPT_ID_LIST + userid);
+        if (ObjectUtil.isNotNull(deptList)) {
+            WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, JSON.toJSONString(deptList));
+        }
+
+
         // 内部请求来源参数清除
         WebFrameworkUtils.removeHeader(mutate);
         removeHeader(mutate);
