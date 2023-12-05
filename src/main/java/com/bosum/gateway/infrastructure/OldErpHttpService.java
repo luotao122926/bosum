@@ -23,10 +23,10 @@ public class OldErpHttpService {
 
     public UserDeptIdsVO getUserInfo(String userId) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("REQUEST_SOURCE","INNER");
+        headers.set("Requestsource","INNER");
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
-        ResultData resultData = restTemplateUtils.get(RestTemplateUtils.ERP_BASE_URL + "/dept/getDeptIdsByUserId", paramMap, headers);
+        ResultData resultData = restTemplateUtils.get(RestTemplateUtils.ERP_BASE_URL + "dept/getDeptIdsByUserId", paramMap, headers);
         if (resultData.isSuccess()) {
             Object data = resultData.getData();
             return JSONObject.toJavaObject((JSON) JSON.toJSON(data), UserDeptIdsVO.class);

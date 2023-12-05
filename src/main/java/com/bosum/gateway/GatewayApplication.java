@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 @EnableDiscoveryClient
-@SpringBootApplication(exclude= {DataSourceAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = {"com.bosum.*"},exclude= {DataSourceAutoConfiguration.class})
 @Import(value = {RestTemplate.class , RestTemplateUtils.class})
 public class GatewayApplication {
 

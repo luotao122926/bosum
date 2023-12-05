@@ -49,7 +49,7 @@ import static cn.hutool.core.date.DatePattern.NORM_DATETIME_MS_FORMATTER;
 @Component
 public class AccessLogFilter implements GlobalFilter, Ordered {
 
-    @Autowired
+    @Resource
     private CodecConfigurer codecConfigurer;
 
     /**

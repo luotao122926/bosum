@@ -23,7 +23,7 @@ public class CorsFilter implements WebFilter, Ordered {
 
     private static final String MAX_AGE = "3600L";
     private static final String METHODS ="POST, GET, PUT, OPTIONS, DELETE";
-    private static final String HEADERS ="Origin, Cache-Control, No-Cache, Pragma, Access-Control-Max-Age,X-Requested-With, X_Requested_With, Content-Type, Content-Disposition, Content-Length, Date, Accept";
+    private static final String HEADERS ="Origin, Cache-Control, No-Cache, Pragma, Access-Control-Max-Age,X-Requested-With, X_Requested_With, Content-Type, Content-Disposition, Content-Length, Date, Accept,REQUEST_SOURCE,CLIENT_TYPE,Authorization,Clienttype,Request-Source,User-Id";
 
     @Override
     public int getOrder() {

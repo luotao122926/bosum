@@ -36,7 +36,7 @@ public class InnerStrategyService implements Strategy {
         //要判断是否是新的erp2接口
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
-        String userId = request.getHeaders().getFirst("USER_ID");
+        String userId = request.getHeaders().getFirst("Bosumforid");
         if (StrUtil.isNotEmpty(userId)) {
             try {
                 //  远程调用老erp服务获取对应的用户信息 并且存放到请求头
@@ -48,6 +48,8 @@ public class InnerStrategyService implements Strategy {
                     WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_MANAGER, userInfo.getManager());
                     WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_SUPER, userInfo.getSuperManager());
                     WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, userInfo.getDeptAuthList());
+                    WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, userInfo.getDeptId());
+                    WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, userInfo.getFeiShuOpenId());
                 }
             } catch (Exception e) {
                 log.error("调用接口失败 ",e);

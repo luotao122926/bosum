@@ -1,8 +1,11 @@
 package com.bosum.gateway.strategy.impl;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.framework.common.constants.TokenConstants;
 import com.bosum.framework.common.util.jwt.JwtUtils;
@@ -14,6 +17,7 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -32,23 +36,37 @@ import reactor.core.publisher.Mono;
 public class NewErpStrategyService implements Strategy {
 
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String,Object> redisTemplate;
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
-        String clientType = request.getHeaders().getFirst("CLIENT_TYPE");
+        String clientType = request.getHeaders().getFirst("Clienttype");
         String token = getToken(request);
+        log.info("请求头的信息的token {}", token);
+        log.info("请求客户端clientType: {}", clientType);
+
+        log.info("请求头信息: {}", JSONUtil.toJsonStr(request.getHeaders()));
+
         if (StrUtil.isEmpty(token)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌不能为空");
         }
-        Claims claims = JwtUtils.parseToken(token);
+        Claims claims ;
+        try {
+             claims = JwtUtils.parseToken(token);
+        } catch (Exception e) {
+            log.error("解析token错误", e);
+            return RespUtils.unauthorizedResponse(exchange, "token不对，请重新登录");
+
+        }
 
         if (claims == null) {
             return RespUtils.unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
         String userid = JwtUtils.getUserId(claims);
+        log.info("从redis获取token的信息 {}", getTokenKey(userid,clientType));
         boolean isLogin = Boolean.TRUE.equals(redisTemplate.hasKey(getTokenKey(userid,clientType)));
+        log.info("isLogin {}", isLogin);
         if (!isLogin) {
             return RespUtils.unauthorizedResponse(exchange, "登录状态已过期");
         }
@@ -56,6 +74,8 @@ public class NewErpStrategyService implements Strategy {
         String userCode = JwtUtils.getUserCode(claims);
         String manager = JwtUtils.getUserManger(claims);
         String userSuper = JwtUtils.getUserSuper(claims);
+        String feishuOpenId = JwtUtils.getFeishuOpenId(claims);
+        String deptId = JwtUtils.getDeptId(claims);
         if (StrUtil.isEmpty(userid) || StrUtil.isEmpty(username)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌验证失败");
         }
@@ -65,8 +85,15 @@ public class NewErpStrategyService implements Strategy {
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_USER_CODE, userCode);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_MANAGER, manager);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_SUPER, userSuper);
+        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, feishuOpenId);
+        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, deptId);
         // 从redis获取
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, redisTemplate.opsForValue().get(SecurityConstants.NEW_ERP_DEPT_ID_LIST + userid));
+        Object deptList = redisTemplate.opsForValue().get(SecurityConstants.NEW_ERP_DEPT_ID_LIST + userid);
+        if (ObjectUtil.isNotNull(deptList)) {
+            WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, JSON.toJSONString(deptList));
+        }
+
+
         // 内部请求来源参数清除
         WebFrameworkUtils.removeHeader(mutate);
         removeHeader(mutate);
@@ -84,7 +111,7 @@ public class NewErpStrategyService implements Strategy {
 
     private void removeHeader(ServerHttpRequest.Builder mutate) {
         mutate.headers(httpHeaders -> httpHeaders.remove(SecurityConstants.REQUEST_SOURCE)).build();
-        mutate.headers(httpHeaders -> httpHeaders.remove("USER_ID")).build();
+//        mutate.headers(httpHeaders -> httpHeaders.remove("userId")).build();
     }
 
 
@@ -105,5 +132,8 @@ public class NewErpStrategyService implements Strategy {
             token = token.replaceFirst(TokenConstants.PREFIX, StrUtil.EMPTY);
         }
         return token;
+
+
+
     }
 }
