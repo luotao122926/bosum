@@ -1,12 +1,12 @@
 server:
   port: 8010
   tomcat:
-    max-http-form-post-size: 65536
-  max-http-header-size: 65536
+    max-http-form-post-size: 8MB
+  max-http-header-size: 8MB
 # spring
 spring:
   codec:
-    max-in-memory-size: 1048576
+    max-in-memory-size: 8MB
   application:
     name: erp-gateway
   main:
