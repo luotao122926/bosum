@@ -13,7 +13,7 @@ spring:
     allow-bean-definition-overriding: true
     web-application-type: reactive
   profiles:
-    active: @nacos.config.active@
+    active: @profiles.active@
 
 #项目名
 ---
@@ -27,5 +27,5 @@ spring:
         namespace: @nacos.config.namespace@
         file-extension: yaml
       discovery:
-        namespace: @nacos.config.namespace@
+        namespace: @nacos.discovery.namespace@
 
