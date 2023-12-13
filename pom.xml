@@ -23,12 +23,6 @@
             <groupId>com.bosum</groupId>
             <artifactId>erp-system-api</artifactId>
             <version>2023.11</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.bosum</groupId>
-                    <artifactId>erp-spring-boot-start-mybatis</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -79,7 +73,6 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-
         <!--和注册中心-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -96,17 +89,17 @@
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-openfeign-core</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>
+        <!-- 设置构建的 jar 包名 -->
         <finalName>${project.artifactId}</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-
         <plugins>
             <!-- 打包 -->
             <plugin>
@@ -123,19 +116,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <!--微信-->
-        <repository>
-            <id>nexus-releases</id>
-            <name>weixin-popular</name>
-            <url>http://172.16.253.20:8081/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>weixin-popular</name>
-            <url>http://172.16.253.20:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>

@@ -13,10 +13,13 @@ import com.bosum.system.api.vo.UserAuthVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import javax.annotation.Resource;
 
 /**
  * 具体策略（ConcreteStrategy）：具体策略是实现策略接口的类。
@@ -27,14 +30,15 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 @ProcessTypeEnumFlag(RequestSourceEnum.INNER)
-@RequiredArgsConstructor
 public class InnerStrategyService implements Strategy {
 
-    private final UserApi userApi;
+    @Lazy
+    @Resource
+    private UserApi userApi;
 
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 要判断是否是新的erp2接口
+        //要判断是否是新的erp2接口
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
         String userId = request.getHeaders().getFirst("Bosumforid");
