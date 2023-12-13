@@ -17,7 +17,6 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -35,8 +34,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class NewErpStrategyService implements Strategy {
 
-
     private final RedisTemplate<String,Object> redisTemplate;
+
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -93,7 +92,6 @@ public class NewErpStrategyService implements Strategy {
             WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_AUTH_LIST, JSON.toJSONString(deptList));
         }
 
-
         // 内部请求来源参数清除
         WebFrameworkUtils.removeHeader(mutate);
         removeHeader(mutate);
@@ -111,7 +109,6 @@ public class NewErpStrategyService implements Strategy {
 
     private void removeHeader(ServerHttpRequest.Builder mutate) {
         mutate.headers(httpHeaders -> httpHeaders.remove(SecurityConstants.REQUEST_SOURCE)).build();
-//        mutate.headers(httpHeaders -> httpHeaders.remove("userId")).build();
     }
 
 
@@ -132,8 +129,5 @@ public class NewErpStrategyService implements Strategy {
             token = token.replaceFirst(TokenConstants.PREFIX, StrUtil.EMPTY);
         }
         return token;
-
-
-
     }
 }
