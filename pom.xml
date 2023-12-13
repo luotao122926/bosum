@@ -3,34 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.bosum</groupId>
+    <parent>
+        <groupId>com.bosum</groupId>
+        <artifactId>erp-service</artifactId>
+        <version>2023.11-SNAPSHOT</version>
+    </parent>
+
     <artifactId>erp-gateway</artifactId>
-    <version>${service.version}</version>
+    <version>2023.11</version>
 
     <properties>
-        <service.version>0.0.1-SNAPSHOT</service.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>2.6.7</spring.boot.version>
-        <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <lombok.version>1.18.30</lombok.version>
-
+        <erp.framework.version>2023.11-SNAPSHOT</erp.framework.version>
+        <erp.service.version>2023.11</erp.service.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.bosum</groupId>
-                <artifactId>erp-dependencies</artifactId>
-                <version>2023.11-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
 
@@ -110,82 +95,8 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.bosum</groupId>
-            <artifactId>erp-spring-boot-start-security</artifactId>
-            <version>2023.11-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
     </dependencies>
-
-    <!-- 环境管理 -->
-    <profiles>
-        <!-- 开发/测试环境，默认激活 -->
-        <profile>
-            <id>dev</id>
-            <properties>
-                <nacos.server>172.16.253.33:8858</nacos.server>
-                <nacos.config.group>erp-dev</nacos.config.group>
-                <nacos.config.namespace>erp-dev</nacos.config.namespace>
-                <nacos.config.active>dev</nacos.config.active>
-            </properties>
-            <activation>
-                <!--默认启用的是dev环境配置 -->
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-
-        <!-- 测试环境 -->
-        <profile>
-            <id>test</id>
-            <properties>
-                <nacos.server>172.16.253.33:8848</nacos.server>
-                <nacos.config.group>erp-test</nacos.config.group>
-                <nacos.config.namespace>erp-test</nacos.config.namespace>
-                <nacos.config.active>test</nacos.config.active>
-            </properties>
-        </profile>
-
-        <!-- QA环境 -->
-        <profile>
-            <id>qa</id>
-            <properties>
-                <nacos.server>172.16.253.33:8848</nacos.server>
-                <nacos.config.group>erp-qa</nacos.config.group>
-                <nacos.config.namespace>erp-qa</nacos.config.namespace>
-                <nacos.config.active>qa</nacos.config.active>
-            </properties>
-        </profile>
-
-        <!-- 预发版环境 -->
-        <profile>
-            <id>release</id>
-            <properties>
-                <nacos.server>172.18.7.139:8848</nacos.server>
-                <nacos.config.group>erp-release</nacos.config.group>
-                <nacos.config.namespace>erp-release</nacos.config.namespace>
-                <nacos.config.active>release</nacos.config.active>
-            </properties>
-        </profile>
-
-        <!-- 生产环境 -->
-        <profile>
-            <id>prod</id>
-            <properties>
-                <nacos.server>172.18.7.139:8848</nacos.server>
-                <nacos.config.group>erp</nacos.config.group>
-                <nacos.config.namespace>erp</nacos.config.namespace>
-                <nacos.config.active>prod</nacos.config.active>
-            </properties>
-        </profile>
-    </profiles>
-
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -195,43 +106,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <pluginManagement>
-            <plugins>
-                <!-- maven-surefire-plugin 插件，用于运行单元测试。 -->
-                <!-- 注意，需要使用 3.0.X+，因为要支持 Junit 5 版本 -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                </plugin>
-                <!-- maven-compiler-plugin 插件，解决 Lombok + MapStruct 组合 -->
-                <!-- https://stackoverflow.com/questions/33483697/re-run-spring-boot-configuration-annotation-processor-to-update-generated-metada -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                    <configuration>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-configuration-processor</artifactId>
-                                <version>${spring.boot.version}</version>
-                            </path>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
-                            </path>
-                            <path>
-                                <groupId>org.mapstruct</groupId>
-                                <artifactId>mapstruct-processor</artifactId>
-                                <version>${mapstruct.version}</version>
-                            </path>
-                        </annotationProcessorPaths>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
 
         <plugins>
             <!-- 打包 -->
@@ -244,31 +118,6 @@
                         <goals>
                             <goal>repackage</goal> <!-- 将引入的 jar 打入其中 -->
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>${flatten-maven-plugin.version}</version>
-                <configuration>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
-                    <updatePomFile>true</updatePomFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                    </execution>
-                    <execution>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
                     </execution>
                 </executions>
             </plugin>
