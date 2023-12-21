@@ -5,6 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.gateway.constant.CacheConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -124,6 +125,21 @@ public class WebFrameworkUtils {
         String valueEncode = URLUtil.encode(valueStr);
         mutate.header(name, valueEncode);
     }
+
+    public static void addHeader(ServerHttpRequest.Builder mutate, JSONObject jsonObject, String name) {
+        if (null == jsonObject || null == name) {
+            return;
+        }
+
+        if(!jsonObject.containsKey(name)){
+            return;
+        }
+
+        String valueStr = jsonObject.getString(name);
+        String valueEncode = URLUtil.encode(valueStr);
+        mutate.header(name, valueEncode);
+    }
+
 
     public static void removeHeader(ServerHttpRequest.Builder mutate) {
         mutate.headers(httpHeaders -> httpHeaders.remove(SecurityConstants.REQUEST_SOURCE)).build();
