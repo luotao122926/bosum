@@ -58,8 +58,7 @@ public class MobileFromStrategyService  implements Strategy {
             log.error("解析token错误", e);
             return RespUtils.unauthorizedResponse(exchange, "token不对，请重新登录");
         }
-
-        String mobile = JwtUtils.getUserName(Convert.toStr(claims.get("mobile"), ""));
+        String mobile = claims.get("mobile", String.class);
         boolean isLogin = Boolean.TRUE.equals(redisTemplate.hasKey(getTokenKey(mobile,clientType)));
         log.info("isLogin {}", isLogin);
         if (!isLogin) {
