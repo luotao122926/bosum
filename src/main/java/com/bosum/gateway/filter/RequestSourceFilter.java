@@ -63,6 +63,10 @@ public class RequestSourceFilter implements GlobalFilter, Ordered {
         if (RequestSourceEnum.INNER.getType().equals(requestSource)) {
             requestSourceEnum = RequestSourceEnum.INNER;
         }
+        if (RequestSourceEnum.MOBILE_FROM.getType().equals(requestSource)) {
+            requestSourceEnum = RequestSourceEnum.MOBILE_FROM;
+        }
+
         return requestMethodStrategyContext.check(requestSourceEnum, exchange, chain);
     }
 
