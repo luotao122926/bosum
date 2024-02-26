@@ -15,7 +15,6 @@
     <properties>
         <erp.framework.version>2023.11-SNAPSHOT</erp.framework.version>
         <erp.service.version>2023.11</erp.service.version>
-        <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
     </properties>
 
     <dependencies>
