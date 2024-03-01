@@ -65,7 +65,7 @@ public class MobileFromStrategyService  implements Strategy {
             return RespUtils.unauthorizedResponse(exchange, "登录状态已过期");
         }
         // 设置用户信息到请求
-        WebFrameworkUtils.addHeader(mutate, "mobile", mobile);
+        WebFrameworkUtils.addHeader(mutate, "Mobile", mobile);
         // 内部请求来源参数清除
         removeHeader(mutate);
         return chain.filter(exchange.mutate().request(mutate.build()).build());
