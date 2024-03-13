@@ -12,11 +12,6 @@
     <artifactId>erp-gateway</artifactId>
     <version>2023.11</version>
 
-    <properties>
-        <erp.framework.version>2023.11-SNAPSHOT</erp.framework.version>
-        <erp.service.version>2023.11</erp.service.version>
-    </properties>
-
     <dependencies>
 
         <dependency>
@@ -86,6 +81,7 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
+
 
     </dependencies>
 
