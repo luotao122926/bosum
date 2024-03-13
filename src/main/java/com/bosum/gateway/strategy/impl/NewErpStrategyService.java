@@ -89,7 +89,6 @@ public class NewErpStrategyService implements Strategy {
 
         // 内部请求来源参数清除
         WebFrameworkUtils.removeHeader(mutate);
-        removeHeader(mutate);
         return chain.filter(exchange.mutate().request(mutate.build()).build());
     }
 
@@ -100,10 +99,6 @@ public class NewErpStrategyService implements Strategy {
         String valueStr = value.toString();
         String valueEncode = URLUtil.encode(valueStr);
         mutate.header(name, valueEncode);
-    }
-
-    private void removeHeader(ServerHttpRequest.Builder mutate) {
-        mutate.headers(httpHeaders -> httpHeaders.remove(SecurityConstants.REQUEST_SOURCE)).build();
     }
 
 
