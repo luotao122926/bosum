@@ -47,7 +47,6 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
             }
         }
 
-        WebFrameworkUtils.addHeader(request.mutate(), SecurityConstants.HEADER_USER_AGENT, clientType.name());
+        WebFrameworkUtils.addHeader(request.mutate(), SecurityConstants.HEADER_USER_AGENT_PLATFORM, clientType.name());
     }
-
 }
