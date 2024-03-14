@@ -10,6 +10,7 @@ public enum RequestSourceEnum {
 
     INNER("INNER", "内部服务访问标识"),
     NEW_ERP("NEW_ERP", "访问新架构的标识"),
+    MOBILE_FROM("MOBILE_FROM", "客户问卷手机号登录验证标识"),
     ;
     private final String type;
     private final String description;
