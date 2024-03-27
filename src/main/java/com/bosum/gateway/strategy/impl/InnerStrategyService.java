@@ -48,7 +48,8 @@ public class InnerStrategyService implements Strategy {
         if (StrUtil.isEmpty(uuid) ) {
             return RespUtils.unauthorizedResponse(exchange, "非法请求");
         }
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(uuid))) {
+        boolean isExist = Boolean.TRUE.equals(redisTemplate.hasKey(uuid));
+        if (!isExist) {
             return RespUtils.unauthorizedResponse(exchange, "非法请求");
         }
         // 从redis获取
