@@ -44,10 +44,12 @@ public class InnerStrategyService implements Strategy {
         ServerHttpRequest.Builder mutate = request.mutate();
         String uuid = request.getHeaders().getFirst("Bosumforid");
 
-        if (StrUtil.isEmpty(uuid) && Boolean.TRUE.equals(redisTemplate.hasKey(uuid))) {
+        if (StrUtil.isEmpty(uuid) ) {
             return RespUtils.unauthorizedResponse(exchange, "非法请求");
         }
-
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(uuid))) {
+            return RespUtils.unauthorizedResponse(exchange, "非法请求");
+        }
         // 从redis获取
         String userId = (String) redisTemplate.opsForValue().get(uuid);
 
