@@ -13,6 +13,7 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -31,13 +32,29 @@ public class InnerStrategyService implements Strategy {
 
     @Autowired
     private InnerUserLoginService userLoginService;
+    @Autowired
+    private  RedisTemplate<String,Object> redisTemplate;
+
+
 
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         //要判断是否是新的erp2接口
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
-        String userId = request.getHeaders().getFirst("Bosumforid");
+        String uuid = request.getHeaders().getFirst("Bosumforid");
+        log.info("请求内部接口生成的uuid, uuid:{}",uuid);
+
+        if (StrUtil.isEmpty(uuid) ) {
+            return RespUtils.unauthorizedResponse(exchange, "非法请求");
+        }
+        boolean isExist = Boolean.TRUE.equals(redisTemplate.hasKey(uuid));
+        if (!isExist) {
+            return RespUtils.unauthorizedResponse(exchange, "非法请求");
+        }
+        // 从redis获取
+        String userId = (String) redisTemplate.opsForValue().get(uuid);
+
         if (StrUtil.isNotEmpty(userId)) {
             try {
 
