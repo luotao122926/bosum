@@ -43,6 +43,7 @@ public class InnerStrategyService implements Strategy {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
         String uuid = request.getHeaders().getFirst("Bosumforid");
+        log.info("请求内部接口生成的uuid, uuid:{}",uuid);
 
         if (StrUtil.isEmpty(uuid) ) {
             return RespUtils.unauthorizedResponse(exchange, "非法请求");
