@@ -44,6 +44,7 @@ public class InnerStrategyService implements Strategy {
         ServerHttpRequest.Builder mutate = request.mutate();
         String uuid = request.getHeaders().getFirst("Bosumforid");
         log.info("请求内部接口生成的uuid, uuid:{}",uuid);
+        log.info("请求内部接口路径, url:{}",request.getPath());
 
         if (StrUtil.isEmpty(uuid) ) {
             return RespUtils.unauthorizedResponse(exchange, "非法请求");
@@ -53,11 +54,11 @@ public class InnerStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange, "非法请求");
         }
         // 从redis获取
-        String userId = (String) redisTemplate.opsForValue().get(uuid);
+        Object userIdObj = redisTemplate.opsForValue().get(uuid);
 
-        if (StrUtil.isNotEmpty(userId)) {
+        if (ObjectUtil.isNotNull(userIdObj)) {
             try {
-
+                String userId = (String) userIdObj;
                 JSONObject userInfo = userLoginService.login(userId);
                 if(ObjectUtil.isEmpty(userInfo)){
                     return RespUtils.unauthorizedResponse(exchange, "用户不存在");
