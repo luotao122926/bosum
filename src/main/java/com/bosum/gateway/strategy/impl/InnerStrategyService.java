@@ -44,13 +44,13 @@ public class InnerStrategyService implements Strategy {
         String bosumforid = request.getHeaders().getFirst("Bosumforid");
 
         if (StrUtil.isEmpty(bosumforid)) {
-            return RespUtils.unauthorizedResponse(exchange, "未知错误");
+            return RespUtils.unauthorizedResponse(exchange, "系统内部错误");
         }
         // 判断redis是否有改key
         boolean flag = Boolean.TRUE.equals(redisTemplate.hasKey(bosumforid));
 
         if (!flag) {
-            return RespUtils.unauthorizedResponse(exchange, "未知错误");
+            return RespUtils.unauthorizedResponse(exchange, "系统内部错误");
         }
         String userId = (String) redisTemplate.opsForValue().get(bosumforid);
         if (StrUtil.isNotEmpty(userId)) {
