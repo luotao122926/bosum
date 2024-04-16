@@ -43,6 +43,8 @@ public class InnerStrategyService implements Strategy {
         ServerHttpRequest.Builder mutate = request.mutate();
         String bosumforid = request.getHeaders().getFirst("Bosumforid");
 
+        log.info("inner invoke old to new bosumforid: {}" , bosumforid);
+
         if (StrUtil.isEmpty(bosumforid)) {
             return RespUtils.unauthorizedResponse(exchange, "系统内部错误");
         }
@@ -53,6 +55,8 @@ public class InnerStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange, "系统内部错误");
         }
         String userId = (String) redisTemplate.opsForValue().get(bosumforid);
+
+        log.info("inner invoke old to new userId: {}" , userId);
         if (StrUtil.isNotEmpty(userId)) {
             try {
                 JSONObject userInfo = userLoginService.login(userId);
