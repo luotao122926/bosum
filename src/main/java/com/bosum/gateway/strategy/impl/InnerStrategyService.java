@@ -13,6 +13,7 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
@@ -32,20 +33,32 @@ public class InnerStrategyService implements Strategy {
     @Autowired
     private InnerUserLoginService userLoginService;
 
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
+
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
         //要判断是否是新的erp2接口
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpRequest.Builder mutate = request.mutate();
-        String userId = request.getHeaders().getFirst("Bosumforid");
+        String bosumforid = request.getHeaders().getFirst("Bosumforid");
+
+        if (StrUtil.isEmpty(bosumforid)) {
+            return RespUtils.unauthorizedResponse(exchange, "未知错误");
+        }
+        // 判断redis是否有改key
+        boolean flag = Boolean.TRUE.equals(redisTemplate.hasKey(bosumforid));
+
+        if (!flag) {
+            return RespUtils.unauthorizedResponse(exchange, "未知错误");
+        }
+        String userId = (String) redisTemplate.opsForValue().get(bosumforid);
         if (StrUtil.isNotEmpty(userId)) {
             try {
-
                 JSONObject userInfo = userLoginService.login(userId);
                 if(ObjectUtil.isEmpty(userInfo)){
                     return RespUtils.unauthorizedResponse(exchange, "用户不存在");
                 }
-
                 WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_USER_ID);
                 WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_USERNAME);
                 WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_USER_CODE);
