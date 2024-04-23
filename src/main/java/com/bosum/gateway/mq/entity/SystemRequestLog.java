@@ -19,7 +19,6 @@ public class SystemRequestLog {
     /** 请求人*/
     private String requestName;
     /** 请求时间*/
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date requestTime;
     /** 创建时间*/
     private String creationTime;
@@ -50,7 +49,6 @@ public class SystemRequestLog {
     /** 请求类型*/
     private String requestContentType;
     /**响应时间*/
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date responseTime;
     /**执行时间*/
     private long executeTime;
