@@ -56,17 +56,22 @@ public class NewErpStrategyService implements Strategy {
         } catch (Exception e) {
             log.error("解析token错误", e);
             return RespUtils.unauthorizedResponse(exchange, "token不对，请重新登录");
-
         }
-
         if (claims == null) {
             return RespUtils.unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
         String userid = JwtUtils.getUserId(claims);
-        log.info("从redis获取token的信息 {}", getTokenKey(userid,clientType));
-        boolean isLogin = Boolean.TRUE.equals(redisTemplate.hasKey(getTokenKey(userid,clientType)));
-        log.info("isLogin {}", isLogin);
-        if (!isLogin) {
+        log.info("从redis获取token的信息key {}", getTokenKey(userid,clientType));
+        Object redisToken = redisTemplate.opsForValue().get(getTokenKey(userid, clientType));
+        if (ObjectUtil.isEmpty(redisToken)) {
+            return RespUtils.unauthorizedResponse(exchange, "登录状态已过期");
+        }
+        String tokenStr = (String) redisToken;
+        if (StrUtil.isEmpty(tokenStr)) {
+            return RespUtils.unauthorizedResponse(exchange, "登录状态已过期");
+        }
+        // 作对比  用作踢人下线
+        if (!tokenStr.equals(token)) {
             return RespUtils.unauthorizedResponse(exchange, "登录状态已过期");
         }
         String username = JwtUtils.getUserName(claims);
