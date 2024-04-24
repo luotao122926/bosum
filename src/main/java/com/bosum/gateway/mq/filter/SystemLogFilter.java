@@ -91,7 +91,8 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         }
         ServerHttpRequest request = exchange.getRequest().mutate()
                  //将获取的真实ip存入header微服务方便获取
-                .header("X-Real-IP",exchange.getRequest().getRemoteAddress().getHostString())
+                //.header("X-Real-IP",exchange.getRequest().getRemoteAddress().getHostString())
+                .header("X-Forwarded-For",exchange.getRequest().getRemoteAddress().getHostString())
                 .build();
        // HttpServletRequest httpServletRequest= (HttpServletRequest) exchange.getRequest();
         String requestPath = request.getPath().pathWithinApplication().value();  // 请求路径
@@ -124,7 +125,9 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
             String os = userAgent.getOperatingSystem().getName();
             systemRequestLog.setOperatingSystem(os);
         }
-        String ip = request.getHeaders().getFirst("X-Real-IP");
+       // String ip = request.getHeaders().getFirst("X-Real-IP");
+        String ip = request.getHeaders().getFirst("X-Forwarded-For");
+
         systemRequestLog.setIp("0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip);
         MediaType mediaType = request.getHeaders().getContentType();
         if (!Objects.isNull(mediaType)){
