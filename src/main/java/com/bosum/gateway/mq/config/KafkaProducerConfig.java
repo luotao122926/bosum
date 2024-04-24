@@ -5,6 +5,7 @@ package com.bosum.gateway.mq.config;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -22,19 +23,19 @@ import java.util.Map;
 @EnableKafka
 public class KafkaProducerConfig {
 
-    @Value("${kafka.producer.bootstrap-servers}")
+    @Value("${kafka.producer.bootstrap-servers:}")
     private String bootstrapServers;
 
-    @Value("${kafka.producer.retries}")
+    @Value("${kafka.producer.retries:}")
     private Integer retries;
 
-    @Value("${kafka.producer.batch-size}")
+    @Value("${kafka.producer.batch-size:}")
     private Integer batchSize;
 
-    @Value("${kafka.producer.buffer-memory}")
+    @Value("${kafka.producer.buffer-memory:}")
     private Integer bufferMemory;
 
-    @Value("${kafka.producer.linger}")
+    @Value("${kafka.producer.linger:}")
     private Integer linger;
 
 
@@ -56,6 +57,8 @@ public class KafkaProducerConfig {
         return producerFactory;
     }
 
+
+    @ConditionalOnProperty(name = "enable.kafka.feature", havingValue = "true")
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
