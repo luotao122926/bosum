@@ -133,7 +133,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         if(null==ip2){
             systemRequestLog.setIp("0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip);
         }else{
-            systemRequestLog.setIp(ip2);
+            systemRequestLog.setIp(ip2+"/"+ip);
         }
 
         MediaType mediaType = request.getHeaders().getContentType();
