@@ -129,9 +129,10 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         }
 
         String ip = request.getHeaders().getFirst("X-Real-IP"); //获取访问ip
+        ip="0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1": ip;
         String ip2 = request.getHeaders().getFirst("X-Forwarded-For");//获取nginx代理真实访问ip
         if(null==ip2){
-            systemRequestLog.setIp("0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip);
+            systemRequestLog.setIp(ip);
         }else{
             systemRequestLog.setIp(ip2+"/"+ip);
         }
