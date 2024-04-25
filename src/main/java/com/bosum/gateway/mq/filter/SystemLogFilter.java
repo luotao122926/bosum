@@ -17,6 +17,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.netty.util.internal.StringUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -37,6 +38,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -53,6 +55,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -93,7 +97,6 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                  //将获取的真实ip存入header微服务方便获取
                 .header("X-Real-IP",exchange.getRequest().getRemoteAddress().getHostString())
                 .build();
-       // HttpServletRequest httpServletRequest= (HttpServletRequest) exchange.getRequest();
         String requestPath = request.getPath().pathWithinApplication().value();  // 请求路径
         Route route = getGatewayRoute(exchange);
         SystemRequestLog systemRequestLog=new SystemRequestLog();
@@ -124,8 +127,16 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
             String os = userAgent.getOperatingSystem().getName();
             systemRequestLog.setOperatingSystem(os);
         }
-        String ip = request.getHeaders().getFirst("X-Real-IP");
-        systemRequestLog.setIp("0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip);
+
+        String ip = request.getHeaders().getFirst("X-Real-IP"); //获取访问ip
+        ip="0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1": ip;
+        String ip2 = request.getHeaders().getFirst("X-Forwarded-For");//获取nginx代理真实访问ip
+        if(null==ip2){
+            systemRequestLog.setIp(ip);
+        }else{
+            systemRequestLog.setIp(ip2+"/"+ip);
+        }
+
         MediaType mediaType = request.getHeaders().getContentType();
         if (!Objects.isNull(mediaType)){
             systemRequestLog.setRequestContentType(mediaType.getType() + "/" + mediaType.getSubtype());

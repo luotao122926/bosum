@@ -2,6 +2,7 @@ package com.bosum.gateway.mq.utils;
 
 
 import com.bosum.framework.common.util.validation.ValidationUtil;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
@@ -14,6 +15,40 @@ import java.net.UnknownHostException;
  */
 public class IpUtils
 {
+
+
+    /**
+     * 获取客户端IP
+     */
+    public static String getIpAddr(ServerHttpRequest request){
+        if (request == null)
+        {
+            return "unknown";
+        }
+        String ip = request.getHeaders().getFirst("X-Forwarded-For");
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
+        {
+            ip = request.getHeaders().getFirst("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
+        {
+            ip = request.getHeaders().getFirst("X-Forwarded-For");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
+        {
+            ip = request.getHeaders().getFirst("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
+        {
+            ip = request.getHeaders().getFirst("X-Real-IP");
+        }else{
+            return "unknown";
+        }
+
+        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : getMultistageReverseProxyIp(ip);
+    }
+
     /**
      * 获取客户端IP
      * 
