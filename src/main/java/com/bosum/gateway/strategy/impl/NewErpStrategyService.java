@@ -90,6 +90,8 @@ public class NewErpStrategyService implements Strategy {
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_SUPER, userSuper);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, feishuOpenId);
         WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, deptId);
+        WebFrameworkUtils.addHeader(mutate, "token", token);
+
 
         // 内部请求来源参数清除
         WebFrameworkUtils.removeHeader(mutate);
