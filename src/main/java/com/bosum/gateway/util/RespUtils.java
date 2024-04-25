@@ -24,4 +24,14 @@ public class RespUtils {
         DataBuffer dataBuffer = response.bufferFactory().wrap(JSONUtil.toJsonPrettyStr(result).getBytes());
         return response.writeWith(Mono.just(dataBuffer));
     }
+
+    public static Mono<Void> unauthorizedResponse(ServerWebExchange exchange, Integer code, String msg) {
+        log.error("[鉴权异常处理]请求路径:{}", exchange.getRequest().getPath());
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.OK);
+        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        ResultData<?> result = new ResultData<>(code,msg);
+        DataBuffer dataBuffer = response.bufferFactory().wrap(JSONUtil.toJsonPrettyStr(result).getBytes());
+        return response.writeWith(Mono.just(dataBuffer));
+    }
 }

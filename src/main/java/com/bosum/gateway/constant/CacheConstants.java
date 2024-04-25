@@ -56,4 +56,6 @@ public class CacheConstants
      * 登录IP黑名单 cache key
      */
     public static final String SYS_LOGIN_BLACKIPLIST = SYS_CONFIG_KEY + "sys.login.blackIPList";
+
+    public static final Integer TOKEN_EXPIRATION_CODE = 5006;
 }
