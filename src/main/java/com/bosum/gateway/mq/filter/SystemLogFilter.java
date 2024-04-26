@@ -77,10 +77,9 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
 
     private final SystemLogProperties systemLogProperties;
 
-    @Autowired
-    private  ServerCodecConfigurer serverCodecConfigurer;
+    private final ServerCodecConfigurer serverCodecConfigurer;
 
-   //private final List<HttpMessageReader<?>> messageReaders = HandlerStrategies.withDefaults().messageReaders();
+/*    private final List<HttpMessageReader<?>> messageReaders = HandlerStrategies.withDefaults().messageReaders();*/
 
     /**
      * 顺序必须是<-1，否则标准的NettyWriteResponseFilter将在您的过滤器得到一个被调用的机会之前发送响应
@@ -150,9 +149,9 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         //对不同的请求类型做相应的处理
         if(MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(mediaType) || MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)){
             return writeBodyLog(exchange, chain, systemRequestLog);
-        }else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)){
+        }/*else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)){
             return readFormData(exchange,chain,systemRequestLog);
-        }else{
+        }*/else{
             return writeBasicLog(exchange, chain, systemRequestLog);
         }
     }
@@ -184,9 +183,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      */
     @SuppressWarnings("unchecked")
     private Mono writeBodyLog(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
-        List<HttpMessageReader<?>> messageReaders = serverCodecConfigurer.getReaders();
-        ServerRequest serverRequest = ServerRequest.create(exchange,messageReaders);
-
+        ServerRequest serverRequest = ServerRequest.create(exchange,serverCodecConfigurer.getReaders());
         Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
                 .flatMap(body ->{
                     gatewayLog.setRequestBody(body);
@@ -335,7 +332,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      * @param gatewayLog
      * @return
      */
-    private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
+   /* private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
         return DataBufferUtils.join(exchange.getRequest().getBody()).flatMap(dataBuffer -> {
             DataBufferUtils.retain(dataBuffer);
             final Flux<DataBuffer> cachedFlux = Flux.defer(() -> Flux.just(dataBuffer.slice(0, dataBuffer.readableByteCount())));
@@ -384,6 +381,6 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                 }));
             });
         });
-    }
+    }*/
 
 }
