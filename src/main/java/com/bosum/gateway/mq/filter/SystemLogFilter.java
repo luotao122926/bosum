@@ -79,8 +79,6 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
 
     private final ServerCodecConfigurer serverCodecConfigurer;
 
-/*    private final List<HttpMessageReader<?>> messageReaders = HandlerStrategies.withDefaults().messageReaders();*/
-
     /**
      * 顺序必须是<-1，否则标准的NettyWriteResponseFilter将在您的过滤器得到一个被调用的机会之前发送响应
      * 也就是说如果不小于 -1 ，将不会执行获取后端响应的逻辑
