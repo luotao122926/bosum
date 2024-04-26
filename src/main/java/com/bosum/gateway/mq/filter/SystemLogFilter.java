@@ -150,9 +150,9 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         //对不同的请求类型做相应的处理
         if(MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(mediaType) || MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)){
             return writeBodyLog(exchange, chain, systemRequestLog);
-        }/*else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)){
+        }else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)){
             return readFormData(exchange,chain,systemRequestLog);
-        }*/else{
+        }else{
             return writeBasicLog(exchange, chain, systemRequestLog);
         }
     }
@@ -335,7 +335,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      * @param gatewayLog
      * @return
      */
-   /* private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
+    private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
         return DataBufferUtils.join(exchange.getRequest().getBody()).flatMap(dataBuffer -> {
             DataBufferUtils.retain(dataBuffer);
             final Flux<DataBuffer> cachedFlux = Flux.defer(() -> Flux.just(dataBuffer.slice(0, dataBuffer.readableByteCount())));
@@ -360,6 +360,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                 //解析 application/x-www-form-urlencoded
                 resolvableType = ResolvableType.forClass(String.class);
             }
+            List<HttpMessageReader<?>> messageReaders = serverCodecConfigurer.getReaders();
             return messageReaders.stream().filter(reader -> reader.canRead(resolvableType, mutatedRequest.getHeaders().getContentType())).findFirst().orElseThrow(() -> new IllegalStateException("no suitable HttpMessageReader.")).readMono(resolvableType, mutatedRequest, Collections.emptyMap()).flatMap(resolvedBody -> {
                 if (resolvedBody instanceof MultiValueMap) {
                     LinkedMultiValueMap map = (LinkedMultiValueMap) resolvedBody;
@@ -383,6 +384,6 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                 }));
             });
         });
-    }*/
+    }
 
 }
