@@ -4,6 +4,7 @@ package com.bosum.gateway.mq.filter;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.bosum.framework.common.util.date.DateTimeUtil;
 import com.bosum.framework.common.util.jwt.JwtUtils;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.factory.rewrite.CachedBodyOutputMessage;
@@ -36,6 +38,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.HttpMessageReader;
+import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -74,7 +77,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
 
     private final SystemLogProperties systemLogProperties;
 
-    private final List<HttpMessageReader<?>> messageReaders = HandlerStrategies.withDefaults().messageReaders();
+    private final ServerCodecConfigurer serverCodecConfigurer;
 
     /**
      * 顺序必须是<-1，否则标准的NettyWriteResponseFilter将在您的过滤器得到一个被调用的机会之前发送响应
@@ -178,8 +181,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      */
     @SuppressWarnings("unchecked")
     private Mono writeBodyLog(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
-        ServerRequest serverRequest = ServerRequest.create(exchange,messageReaders);
-
+        ServerRequest serverRequest = ServerRequest.create(exchange,serverCodecConfigurer.getReaders());
         Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
                 .flatMap(body ->{
                     gatewayLog.setRequestBody(body);
@@ -328,7 +330,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      * @param gatewayLog
      * @return
      */
-    private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
+   /* private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
         return DataBufferUtils.join(exchange.getRequest().getBody()).flatMap(dataBuffer -> {
             DataBufferUtils.retain(dataBuffer);
             final Flux<DataBuffer> cachedFlux = Flux.defer(() -> Flux.just(dataBuffer.slice(0, dataBuffer.readableByteCount())));
@@ -353,6 +355,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                 //解析 application/x-www-form-urlencoded
                 resolvableType = ResolvableType.forClass(String.class);
             }
+            List<HttpMessageReader<?>> messageReaders = serverCodecConfigurer.getReaders();
             return messageReaders.stream().filter(reader -> reader.canRead(resolvableType, mutatedRequest.getHeaders().getContentType())).findFirst().orElseThrow(() -> new IllegalStateException("no suitable HttpMessageReader.")).readMono(resolvableType, mutatedRequest, Collections.emptyMap()).flatMap(resolvedBody -> {
                 if (resolvedBody instanceof MultiValueMap) {
                     LinkedMultiValueMap map = (LinkedMultiValueMap) resolvedBody;
@@ -376,6 +379,6 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                 }));
             });
         });
-    }
+    }*/
 
 }
