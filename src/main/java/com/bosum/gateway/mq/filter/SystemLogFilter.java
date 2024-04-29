@@ -144,14 +144,22 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         if (!Objects.isNull(mediaType)){
             systemRequestLog.setRequestContentType(mediaType.getType() + "/" + mediaType.getSubtype());
         }
-        //对不同的请求类型做相应的处理
-        if(MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)){
-            return writeBodyLog(exchange, chain, systemRequestLog);
-        }else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType) || MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(mediaType)){
-            return readFormData(exchange,chain,systemRequestLog);
+
+
+
+        if("POST".equals(request.getMethodValue())){
+            //对不同的请求类型做相应的处理
+            if(MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)){
+                return writeBodyLog(exchange, chain, systemRequestLog);
+            }else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType) || MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(mediaType)){
+                return readFormData(exchange,chain,systemRequestLog);
+            }else{
+                return writeBasicLog(exchange, chain, systemRequestLog);
+            }
         }else{
             return writeBasicLog(exchange, chain, systemRequestLog);
         }
+
     }
 
     private Mono<Void> writeBasicLog(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog accessLog) {
@@ -184,7 +192,12 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         ServerRequest serverRequest = ServerRequest.create(exchange,serverCodecConfigurer.getReaders());
         Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
                 .flatMap(body ->{
-                    gatewayLog.setRequestBody(body);
+
+                    if (!Objects.isNull(gatewayLog.getRequestContentType())){ //如果是流就不存储日志了
+                        if ("application/json".equals(gatewayLog.getRequestContentType())) {
+                            gatewayLog.setRequestBody(body);
+                        }
+                    }
                     return Mono.just(body);
                 });
         // 通过 BodyInserter 插入 body(支持修改body), 避免 request body 只能获取一次
@@ -215,7 +228,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      * 打印日志 存储日志
      */
     private void writeAccessLog(SystemRequestLog gatewayLog,ServerWebExchange exchange) {
-        log.info("打印日志"+gatewayLog.toString());
+        //log.info("打印日志"+gatewayLog.toString());
         ServerHttpRequest request = exchange.getRequest();
         //获取用户信息
         String token = request.getHeaders().getFirst("token");
@@ -310,7 +323,11 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                             DataBufferUtils.release(join);
                             String responseResult = new String(content, StandardCharsets.UTF_8);
 
-                            gatewayLog.setResponseData(responseResult);
+                            if (!Objects.isNull(gatewayLog.getRequestContentType())){ //如果是流就不存储日志了
+                                if ("application/json".equals(gatewayLog.getRequestContentType())) {
+                                    gatewayLog.setResponseData(responseResult);
+                                }
+                            }
 
                             return bufferFactory.wrap(content);
                         }));
