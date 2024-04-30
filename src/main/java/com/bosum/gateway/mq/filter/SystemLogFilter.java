@@ -79,7 +79,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
 
     private final ServerCodecConfigurer serverCodecConfigurer;
 
-    private static final List<HttpMessageReader<?>> MESSAGE_READERS = HandlerStrategies.withDefaults().messageReaders();
+/*    private static final List<HttpMessageReader<?>> MESSAGE_READERS = HandlerStrategies.withDefaults().messageReaders();*/
 
     /**
      * 顺序必须是<-1，否则标准的NettyWriteResponseFilter将在您的过滤器得到一个被调用的机会之前发送响应
@@ -190,11 +190,10 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
      * @return
      */
     @SuppressWarnings("unchecked")
-  /*  private Mono writeBodyLog(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
+    private Mono writeBodyLog(ServerWebExchange exchange, GatewayFilterChain chain, SystemRequestLog gatewayLog) {
         ServerRequest serverRequest = ServerRequest.create(exchange,serverCodecConfigurer.getReaders());
         Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
                 .flatMap(body ->{
-
                     if (!Objects.isNull(gatewayLog.getRequestContentType())){ //如果是流就不存储日志了
                         if ("application/json".equals(gatewayLog.getRequestContentType())) {
                             gatewayLog.setRequestBody(body);
@@ -224,7 +223,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                                 writeAccessLog(gatewayLog,exchange);
                             }));
                 }));
-    }*/
+    }
 
     /**
      * 打印日志 存储日志
@@ -325,6 +324,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                             DataBufferUtils.release(join);
                             String responseResult = new String(content, StandardCharsets.UTF_8);
                             gatewayLog.setResponseData(responseResult);
+
                             if (!Objects.isNull(gatewayLog.getRequestContentType())){ //如果是流就不存储日志了
                                 if ("application/json".equals(gatewayLog.getRequestContentType())) {
                                     gatewayLog.setResponseData(responseResult);
@@ -390,6 +390,13 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
                 } else {
                     gatewayLog.setRequestBody((String) resolvedBody);
                 }
+
+                if (!Objects.isNull(gatewayLog.getRequestContentType())){ //如果是流就不存储日志了
+                    if (!"application/json".equals(gatewayLog.getRequestContentType())) {
+                        gatewayLog.setRequestBody(null);
+                    }
+                }
+
                 //获取响应体
                 ServerHttpResponseDecorator decoratedResponse = recordResponseLog(exchange, gatewayLog);
                 return chain.filter(exchange.mutate().request(mutatedRequest).response(decoratedResponse).build()).then(Mono.fromRunnable(() -> {                                    // 打印日志
