@@ -105,7 +105,7 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         String requestPath = request.getPath().pathWithinApplication().value();  // 请求路径
         Route route = getGatewayRoute(exchange);
         SystemRequestLog systemRequestLog=new SystemRequestLog();
-        systemRequestLog.setProjectCloud("erp");
+        systemRequestLog.setProjectCloud(systemLogProperties.getProjectName());
         systemRequestLog.setLogId(UUID.randomUUID().toString());
         systemRequestLog.setSchema(request.getURI().getScheme());
         systemRequestLog.setRequestMethod(request.getMethodValue());

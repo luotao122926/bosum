@@ -16,4 +16,10 @@ public class SystemLogProperties {
     @Value("${systemlog.enabled:false}")
     private Boolean enabled;
 
+    /**
+     * 项目名字
+     */
+    @Value("${systemlog.project-name:}")
+    private String projectName;
+
 }
