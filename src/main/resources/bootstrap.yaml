@@ -5,6 +5,8 @@ server:
   max-http-header-size: 20MB
 # spring
 spring:
+  codec:
+    max-in-memory-size: 100MB
   application:
     name: erp-gateway
   main:
@@ -17,8 +19,6 @@ spring:
 ---
 # nacos
 spring:
-  codec:
-    max-in-memory-size: 100MB
   cloud:
     nacos:
       server-addr: @nacos.server@
