@@ -6,7 +6,7 @@ server:
 # spring
 spring:
   codec:
-    max-in-memory-size: 20MB
+    max-in-memory-size: 100MB
   application:
     name: erp-gateway
   main:
