@@ -14,6 +14,7 @@ import com.bosum.gateway.mq.constant.Topic;
 import com.bosum.gateway.mq.entity.SystemRequestLog;
 import com.bosum.gateway.mq.kafka.KafkaSender;
 import com.bosum.gateway.mq.utils.DateUtils;
+import com.bosum.gateway.util.UrlUtils;
 import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.Claims;
 import io.netty.util.internal.StringUtil;
@@ -98,11 +99,16 @@ public class SystemLogFilter implements GlobalFilter, Ordered {
         if (!systemLogProperties.getEnabled()){
             return chain.filter(exchange);
         }
+
         ServerHttpRequest request = exchange.getRequest().mutate()
                  //将获取的真实ip存入header微服务方便获取
                 .header("X-Real-IP",exchange.getRequest().getRemoteAddress().getHostString())
                 .build();
         String requestPath = request.getPath().pathWithinApplication().value();  // 请求路径
+        if (UrlUtils.matches(requestPath, systemLogProperties.getUrls())) {
+            return chain.filter(exchange);
+        }
+
         Route route = getGatewayRoute(exchange);
         SystemRequestLog systemRequestLog=new SystemRequestLog();
         systemRequestLog.setProjectCloud(systemLogProperties.getProjectName());
