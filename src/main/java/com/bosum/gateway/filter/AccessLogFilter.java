@@ -33,6 +33,11 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
 
     private void addPlatform(ServerHttpRequest request){
         String userAgentStr = request.getHeaders().getFirst("User-Agent");
+
+        if(ObjUtil.isEmpty(userAgentStr)){
+            return;
+        }
+
         UserAgent userAgent = UserAgentUtil.parse(userAgentStr);
         ClientTypeEnum clientType = ClientTypeEnum.WEB;
 
