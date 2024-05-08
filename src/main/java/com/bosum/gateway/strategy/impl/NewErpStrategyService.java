@@ -40,7 +40,7 @@ public class NewErpStrategyService implements Strategy {
 
     private final RedisTemplate<String,Object> redisTemplate;
 
-    @Value("${erp.kickGray: true}")
+    @Value("${erp.kickGray:true}")
     private Boolean kickGray;
 
     @Override
