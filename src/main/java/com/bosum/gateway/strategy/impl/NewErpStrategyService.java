@@ -18,6 +18,8 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -33,9 +35,13 @@ import reactor.core.publisher.Mono;
 @Service
 @ProcessTypeEnumFlag(RequestSourceEnum.NEW_ERP)//自定义注解，标注该类为FOCUS_PROCESS
 @RequiredArgsConstructor
+@RefreshScope
 public class NewErpStrategyService implements Strategy {
 
     private final RedisTemplate<String,Object> redisTemplate;
+
+    @Value("${erp.kickGray: true}")
+    private Boolean kickGray;
 
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -70,7 +76,8 @@ public class NewErpStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
         }
         // 作对比  用作踢人下线
-        if (!tokenStr.equals(token)) {
+        log.info("踢人下线标识: {}", kickGray);
+        if (!tokenStr.equals(token) && kickGray) {
             return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
         }
         String username = JwtUtils.getUserName(claims);
