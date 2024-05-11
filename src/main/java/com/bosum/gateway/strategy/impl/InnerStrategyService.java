@@ -1,5 +1,6 @@
 package com.bosum.gateway.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -18,6 +19,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * 具体策略（ConcreteStrategy）：具体策略是实现策略接口的类。
@@ -60,17 +63,16 @@ public class InnerStrategyService implements Strategy {
                 if(ObjectUtil.isEmpty(userInfo)){
                     return RespUtils.unauthorizedResponse(exchange, "用户不存在");
                 }
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_USER_ID);
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_USERNAME);
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_USER_CODE);
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_IS_MANAGER);
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_IS_SUPER);
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_DEPT_ID);
-                WebFrameworkUtils.addHeader(mutate, userInfo, SecurityConstants.DETAILS_FEISHU_OPENID);
+
+                List<String> headerKeyArr = SecurityConstants.getHeaderKey();
+                if(!CollUtil.isEmpty(headerKeyArr)){
+                    for (String headerKey : headerKeyArr) {
+                        WebFrameworkUtils.addHeader(mutate, userInfo, headerKey);
+                    }
+                }
+
             } catch (Exception e) {
                 log.error("调用接口失败 ", e);
-                // 为了不影响网关直接放行处理
-//                return chain.filter(exchange);
                 return RespUtils.unauthorizedResponse(exchange, "用户授权登录失败");
             }
         }
