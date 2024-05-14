@@ -1,15 +1,13 @@
 package com.bosum.gateway.strategy.impl;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.framework.common.constants.TokenConstants;
 import com.bosum.framework.common.util.jwt.JwtUtils;
-import com.bosum.gateway.constant.CacheConstants;
 import com.bosum.gateway.enums.ProcessTypeEnumFlag;
 import com.bosum.gateway.enums.RequestSourceEnum;
 import com.bosum.gateway.strategy.Strategy;
@@ -18,12 +16,16 @@ import com.bosum.gateway.util.WebFrameworkUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * 具体策略（ConcreteStrategy）：具体策略是实现策略接口的类。
@@ -33,9 +35,13 @@ import reactor.core.publisher.Mono;
 @Service
 @ProcessTypeEnumFlag(RequestSourceEnum.NEW_ERP)//自定义注解，标注该类为FOCUS_PROCESS
 @RequiredArgsConstructor
+@RefreshScope
 public class NewErpStrategyService implements Strategy {
 
     private final RedisTemplate<String,Object> redisTemplate;
+
+    @Value("${erp.kickGray:true}")
+    private Boolean kickGray;
 
     @Override
     public Mono<Void> check(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -70,28 +76,22 @@ public class NewErpStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
         }
         // 作对比  用作踢人下线
-        if (!tokenStr.equals(token)) {
+        log.info("踢人下线标识: {}", kickGray);
+        if (!tokenStr.equals(token) && kickGray) {
             return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
         }
         String username = JwtUtils.getUserName(claims);
-        String userCode = JwtUtils.getUserCode(claims);
-        String manager = JwtUtils.getUserManger(claims);
-        String userSuper = JwtUtils.getUserSuper(claims);
-        String feishuOpenId = JwtUtils.getFeishuOpenId(claims);
-        String deptId = JwtUtils.getDeptId(claims);
         if (StrUtil.isEmpty(userid) || StrUtil.isEmpty(username)) {
             return RespUtils.unauthorizedResponse(exchange, "令牌验证失败");
         }
-        // 设置用户信息到请求
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_USER_ID, userid);
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_USERNAME, username);
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_USER_CODE, userCode);
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_MANAGER, manager);
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_IS_SUPER, userSuper);
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_FEISHU_OPENID, feishuOpenId);
-        WebFrameworkUtils.addHeader(mutate, SecurityConstants.DETAILS_DEPT_ID, deptId);
-        WebFrameworkUtils.addHeader(mutate, "token", token);
 
+        List<String> headerKeyArr = SecurityConstants.getHeaderKey();
+        if(!CollUtil.isEmpty(headerKeyArr)){
+            for (String key : headerKeyArr) {
+                WebFrameworkUtils.addHeader(mutate, key, JwtUtils.getValue(claims, key));
+            }
+        }
+        WebFrameworkUtils.addHeader(mutate, "token", token);
 
         // 内部请求来源参数清除
         WebFrameworkUtils.removeHeader(mutate);

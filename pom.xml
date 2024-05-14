@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.bosum</groupId>
         <artifactId>erp-service</artifactId>
-        <version>2024.02-SNAPSHOT</version>
+        <version>2024.05-SNAPSHOT</version>
     </parent>
 
     <artifactId>erp-gateway</artifactId>
@@ -17,7 +17,6 @@
         <dependency>
             <groupId>com.bosum</groupId>
             <artifactId>erp-common</artifactId>
-            <version>2023.11-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -33,7 +32,6 @@
         <dependency>
             <groupId>com.bosum</groupId>
             <artifactId>erp-spring-boot-start-redis</artifactId>
-            <version>2023.11-SNAPSHOT</version>
         </dependency>
 
         <dependency>
