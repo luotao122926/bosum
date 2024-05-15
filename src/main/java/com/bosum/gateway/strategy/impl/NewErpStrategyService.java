@@ -60,25 +60,25 @@ public class NewErpStrategyService implements Strategy {
              claims = JwtUtils.parseToken(token);
         } catch (Exception e) {
             log.error("解析token错误", e);
-            return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,"解析token错误");
         }
         if (claims == null) {
-            return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
         String userid = JwtUtils.getUserId(claims);
         log.info("从redis获取token的信息key {}", getTokenKey(userid,clientType));
         Object redisToken = redisTemplate.opsForValue().get(getTokenKey(userid, clientType));
         if (ObjectUtil.isEmpty(redisToken)) {
-            return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
         String tokenStr = (String) redisToken;
         if (StrUtil.isEmpty(tokenStr)) {
-            return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
         // 作对比  用作踢人下线
         log.info("踢人下线标识: {}", kickGray);
         if (!tokenStr.equals(token) && kickGray) {
-            return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
         String username = JwtUtils.getUserName(claims);
         if (StrUtil.isEmpty(userid) || StrUtil.isEmpty(username)) {
