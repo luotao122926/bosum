@@ -6,11 +6,14 @@ import com.bosum.auditlog.producer.core.service.LogService;
 import com.bosum.framework.common.constants.Constants;
 import com.bosum.framework.common.constants.SecurityConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,6 +26,10 @@ import java.util.Map;
 @Slf4j
 @Component
 public class AuditService implements LogService {
+
+
+    @Autowired
+    Environment environment;
 
     @Override
     public LogUserInfo getLogUserInfo(ServerHttpRequest request) {
@@ -41,7 +48,9 @@ public class AuditService implements LogService {
 
     @Override
     public Map<String, Object> getExpendMsg(ServerHttpRequest request) {
-        return null;
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("env", environment.getActiveProfiles()[0]);
+        return hashMap;
     }
 
     @Override
