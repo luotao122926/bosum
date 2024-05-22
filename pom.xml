@@ -104,7 +104,18 @@
             <version>1.21</version>
         </dependency>
 
+        <!-- 注入日志 -->
+        <dependency>
+            <groupId>com.bosum.log</groupId>
+            <artifactId>audit-log-producer</artifactId>
+            <version>2024.01-SNAPSHOT</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.bosum.log</groupId>
+            <artifactId>audit-log-common</artifactId>
+            <version>2024.01-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
