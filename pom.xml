@@ -81,17 +81,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.bosum.cloud</groupId>
-            <artifactId>bosum-spring-boot-starter-nacos-local-load</artifactId>
-            <version>2024.03.28-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
@@ -108,13 +97,7 @@
         <dependency>
             <groupId>com.bosum.log</groupId>
             <artifactId>audit-log-producer</artifactId>
-            <version>2024.01-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.bosum.log</groupId>
-            <artifactId>audit-log-common</artifactId>
-            <version>2024.01-SNAPSHOT</version>
+            <version>2024.06-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
