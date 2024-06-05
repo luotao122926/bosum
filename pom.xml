@@ -97,7 +97,7 @@
         <dependency>
             <groupId>com.bosum.log</groupId>
             <artifactId>audit-log-producer</artifactId>
-            <version>2024.06.004-SNAPSHOT</version>
+            <version>2024.06.010-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

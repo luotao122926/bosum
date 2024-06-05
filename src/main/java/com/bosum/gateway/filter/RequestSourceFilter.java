@@ -40,7 +40,6 @@ public class RequestSourceFilter implements GlobalFilter, Ordered {
 
         RequestSourceEnum requestSourceEnum = null;
         String url = request.getURI().getPath();
-        log.info("请求url为: {}", url);
         // 顶层白名单，一律放行
         if (UrlUtils.matches(url, commonWhitesProperties.getUrl())) {
             return chain.filter(exchange);
