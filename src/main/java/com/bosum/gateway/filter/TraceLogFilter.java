@@ -5,6 +5,7 @@ import cn.hutool.http.useragent.Platform;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.bosum.framework.common.constants.SecurityConstants;
+import com.bosum.framework.common.util.MDCTraceUtil;
 import com.bosum.gateway.enums.ClientTypeEnum;
 import com.bosum.gateway.util.WebFrameworkUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
-public class AccessLogFilter implements GlobalFilter, Ordered {
+public class TraceLogFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
@@ -28,7 +29,17 @@ public class AccessLogFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         addPlatform(exchange.getRequest());
-        return chain.filter(exchange);
+       try{
+           String traceId = exchange.getRequest().getHeaders().getFirst(MDCTraceUtil.TRACE_ID_HEADER);
+           MDCTraceUtil.putIfAbsent(traceId);
+           ServerHttpRequest.Builder mutate = exchange.getRequest().mutate();
+           // 向下传递
+           mutate.header(MDCTraceUtil.TRACE_ID_HEADER, MDCTraceUtil.getTraceId());
+           return chain.filter(exchange.mutate().request(mutate.build()).build())
+                   .then(Mono.fromRunnable(MDCTraceUtil::removeTrace));
+       }catch (Exception e){
+           return Mono.error(e);
+       }
     }
 
     private void addPlatform(ServerHttpRequest request){

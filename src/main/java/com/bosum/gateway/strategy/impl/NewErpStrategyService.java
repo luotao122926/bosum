@@ -4,7 +4,6 @@ package com.bosum.gateway.strategy.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.framework.common.constants.TokenConstants;
 import com.bosum.framework.common.util.jwt.JwtUtils;
@@ -49,9 +48,6 @@ public class NewErpStrategyService implements Strategy {
         ServerHttpRequest.Builder mutate = request.mutate();
         String clientType = request.getHeaders().getFirst("Clienttype");
         String token = getToken(request);
-        log.info("请求头的信息的token {}", token);
-        log.info("请求客户端clientType: {}", clientType);
-        log.info("请求头信息: {}", JSONUtil.toJsonStr(request.getHeaders()));
         if (StrUtil.isEmpty(token)) {
             return RespUtils.unauthorizedResponse(exchange,"登录状态已过期");
         }
@@ -66,7 +62,6 @@ public class NewErpStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
         String userid = JwtUtils.getUserId(claims);
-        log.info("从redis获取token的信息key {}", getTokenKey(userid,clientType));
         Object redisToken = redisTemplate.opsForValue().get(getTokenKey(userid, clientType));
         if (ObjectUtil.isEmpty(redisToken)) {
             return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
@@ -76,7 +71,6 @@ public class NewErpStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
         // 作对比  用作踢人下线
-        log.info("踢人下线标识: {}", kickGray);
         if (!tokenStr.equals(token) && kickGray) {
             return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
         }
