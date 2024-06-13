@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.bosum.framework.common.constants.SecurityConstants;
 import com.bosum.framework.common.constants.TokenConstants;
 import com.bosum.framework.common.util.jwt.JwtUtils;
+import com.bosum.gateway.constant.CacheConstants;
 import com.bosum.gateway.enums.ProcessTypeEnumFlag;
 import com.bosum.gateway.enums.RequestSourceEnum;
 import com.bosum.gateway.strategy.Strategy;
@@ -59,20 +60,20 @@ public class NewErpStrategyService implements Strategy {
             return RespUtils.unauthorizedResponse(exchange,"解析token错误");
         }
         if (claims == null) {
-            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange, CacheConstants.TOKEN_NULL,"登录状态已过期");
         }
         String userid = JwtUtils.getUserId(claims);
         Object redisToken = redisTemplate.opsForValue().get(getTokenKey(userid, clientType));
         if (ObjectUtil.isEmpty(redisToken)) {
-            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,CacheConstants.TOKEN_NULL,"登录状态已过期");
         }
         String tokenStr = (String) redisToken;
         if (StrUtil.isEmpty(tokenStr)) {
-            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,CacheConstants.TOKEN_NULL,"登录状态已过期");
         }
         // 作对比  用作踢人下线
         if (!tokenStr.equals(token) && kickGray) {
-            return RespUtils.unauthorizedResponse(exchange,5009,"登录状态已过期");
+            return RespUtils.unauthorizedResponse(exchange,CacheConstants.TOKEN_NULL,"登录状态已过期");
         }
         String username = JwtUtils.getUserName(claims);
         if (StrUtil.isEmpty(userid) || StrUtil.isEmpty(username)) {
