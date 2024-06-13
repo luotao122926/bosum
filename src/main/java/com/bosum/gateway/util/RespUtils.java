@@ -21,7 +21,10 @@ public class RespUtils {
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         ResultData<?> result = new ResultData<>(5005,msg);
-        DataBuffer dataBuffer = response.bufferFactory().wrap(JSONUtil.toJsonPrettyStr(result).getBytes());
+        String resStr = JSONUtil.toJsonPrettyStr(result);
+        DataBuffer dataBuffer = response.bufferFactory().wrap(resStr.getBytes());
+        // 返回信息
+        log.info("[鉴权异常处理]返回参数: {}",resStr);
         return response.writeWith(Mono.just(dataBuffer));
     }
 
@@ -31,7 +34,10 @@ public class RespUtils {
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         ResultData<?> result = new ResultData<>(code,msg);
-        DataBuffer dataBuffer = response.bufferFactory().wrap(JSONUtil.toJsonPrettyStr(result).getBytes());
+        String resStr = JSONUtil.toJsonPrettyStr(result);
+        DataBuffer dataBuffer = response.bufferFactory().wrap(resStr.getBytes());
+        // 返回信息
+        log.info("[鉴权异常处理]返回参数: {}",resStr);
         return response.writeWith(Mono.just(dataBuffer));
     }
 }
