@@ -16,8 +16,7 @@ import reactor.core.publisher.Mono;
 public class RespUtils {
 
     public static Mono<Void> unauthorizedResponse(ServerWebExchange exchange, String msg) {
-        log.error("[鉴权异常处理]请求路径:{}", exchange.getRequest().getPath());
-        log.error("[鉴权异常处理]请求异常:{}", msg);
+        log.error("[鉴权异常处理]请求路径:{},错误信息为: {}", exchange.getRequest().getPath(),msg);
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
@@ -27,8 +26,7 @@ public class RespUtils {
     }
 
     public static Mono<Void> unauthorizedResponse(ServerWebExchange exchange, Integer code, String msg) {
-        log.error("[鉴权异常处理]请求路径:{}", exchange.getRequest().getPath());
-        log.error("[鉴权异常处理]请求异常:{}", msg);
+        log.error("[鉴权异常处理]请求路径:{},错误信息为: {}", exchange.getRequest().getPath(),msg);
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatus.OK);
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
