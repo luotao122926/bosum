@@ -25,6 +25,7 @@ import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -40,13 +41,11 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.a
 
 /**
  * 支持灰度功能的 {@link ReactiveLoadBalancerClientFilter} 实现类
- *
  * 由于 {@link ReactiveLoadBalancerClientFilter#choose(Request, String, Set)} 是 private 方法，无法进行重写。
  * 因此，这里只好 copy 它所有的代码，手动重写 choose 方法
- *
  * 具体的使用与实现原理，可阅读如下两个文章：
- * 1. https://www.jianshu.com/p/6db15bc0be8f
- * 2. https://cloud.tencent.com/developer/article/1620795
+ * 1. <a href="https://www.jianshu.com/p/6db15bc0be8f">...</a>
+ * 2. <a href="https://cloud.tencent.com/developer/article/1620795">...</a>
  *
  * @author 芋道源码
  */
@@ -72,22 +71,17 @@ public class GrayReactiveLoadBalancerClientFilter implements GlobalFilter, Order
 
         // 生产环境不进行负载判断
         if(StrUtil.equals(environment.getProperty("spring.profiles.active"), "prod")){
-            return chain.filter(exchange);
+            ServerHttpRequest originalRequest = exchange.getRequest();
+
+            ServerHttpRequest build = originalRequest.mutate()
+                    .headers(httpHeaders -> httpHeaders.remove(GrayLoadBalancer.LOCAL_DEBUG))
+                    .build();
+
+            return chain.filter(exchange.mutate().request(build).build());
         }
 
         URI url = exchange.getAttribute(GATEWAY_REQUEST_URL_ATTR);
         String schemePrefix = exchange.getAttribute(GATEWAY_SCHEME_PREFIX_ATTR);
-        // 修改 by 芋道源码：将 lb 替换成 grayLb，表示灰度负载均衡
-//        if (url == null || (!"grayLb".equals(url.getScheme()) && !"grayLb".equals(schemePrefix))) {
-//            return chain.filter(exchange);
-//        }
-
-        // 此处采用获取访问接口是否带version
-        String version = exchange.getRequest().getHeaders().getFirst(GrayLoadBalancer.VERSION);
-//        if(StrUtil.isEmpty(version)){
-//            return chain.filter(exchange);
-//        }
-
         // preserve the original url
         addOriginalRequestUrl(exchange, url);
 
@@ -150,7 +144,6 @@ public class GrayReactiveLoadBalancerClientFilter implements GlobalFilter, Order
 
     private Mono<Response<ServiceInstance>> choose(Request<RequestDataContext> lbRequest, String serviceId,
                                                    Set<LoadBalancerLifecycle> supportedLifecycleProcessors) {
-        // 修改 by 芋道源码：直接创建 GrayLoadBalancer 对象
         GrayLoadBalancer loadBalancer = new GrayLoadBalancer(
                 clientFactory.getLazyProvider(serviceId, ServiceInstanceListSupplier.class), serviceId);
         supportedLifecycleProcessors.forEach(lifecycle -> lifecycle.onStart(lbRequest));

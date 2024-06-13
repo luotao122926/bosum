@@ -28,8 +28,6 @@ import java.util.List;
  *  灰度控制类
  *  根据header中的标记进行筛选
  *
- *
- *
  * @author zhubingbing
  * @date 2024/5/28 9:37
  */
@@ -37,8 +35,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GrayLoadBalancer implements ReactorServiceInstanceLoadBalancer {
 
-    /** 标记属性 */
+    /** 灰度发布标识  */
     public static final String VERSION = "Gray-version";
+
+    /** 本地调试标识，如果采用灰度发布，可以采用新的标识 */
+    public static final String LOCAL_DEBUG = "Local-debug";
 
     /** 实例列表 */
     private final ObjectProvider<ServiceInstanceListSupplier> serviceInstanceListSupplierProvider;
@@ -59,20 +60,24 @@ public class GrayLoadBalancer implements ReactorServiceInstanceLoadBalancer {
         }
 
         // 根据条件筛选
-        String version = headers.getFirst(VERSION);
-        List<ServiceInstance> chooseInstances = null;
-        // 如果没有注入筛选条件，则注入所有实例
-        if(!StrUtil.isEmpty(version)){
-            chooseInstances =  CollectionUtils.filterList(instanceList, instance -> StrUtil.equals(version, instance.getMetadata().get(VERSION)));
-        }
+        String localDebug = headers.getFirst(LOCAL_DEBUG);
+        List<ServiceInstance> chooseInstances = CollectionUtils.filterList(instanceList, instance -> {
+            String metaData = instance.getMetadata().get(LOCAL_DEBUG);
+            return StrUtil.isNotEmpty(localDebug) ? StrUtil.equals(localDebug, metaData) : StrUtil.isEmpty(metaData);
+        });
 
-        if(CollUtil.isEmpty(chooseInstances)){
-            if(!StrUtil.isEmpty(version)){
-                log.warn("[getInstanceResponse][serviceId({}) 没有满足版本({})的服务实例列表，直接使用所有服务实例列表]", serviceId, version);
-            }
-
+        // 如果是本地debug模式，采取降级
+        if(!StrUtil.isEmpty(localDebug) && CollUtil.isEmpty(chooseInstances)){
+            log.warn("[getInstanceResponse][serviceId({}) 没有满足版本({})的服务实例列表，直接使用所有服务实例列表]", serviceId, localDebug);
             chooseInstances = instanceList;
         }
+
+        // tag 非空, 不能降级
+        if (CollUtil.isEmpty(chooseInstances)) {
+            log.warn("[getInstanceResponse][serviceId({}) 服务实例列表为空]", serviceId);
+            return new EmptyResponse();
+        }
+
         return new DefaultResponse(NacosBalancer.getHostByRandomWeight3(chooseInstances));
     }
 
