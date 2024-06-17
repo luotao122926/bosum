@@ -60,7 +60,7 @@ public class GrayLoadBalancer implements ReactorServiceInstanceLoadBalancer {
         }
 
         // 根据条件筛选
-        String localDebug = headers.getFirst(LOCAL_DEBUG);
+        String localDebug = headers.getFirst(LOCAL_DEBUG.replace("-", ""));
         List<ServiceInstance> chooseInstances = CollectionUtils.filterList(instanceList, instance -> {
             String metaData = instance.getMetadata().get(LOCAL_DEBUG);
             return StrUtil.isNotEmpty(localDebug) ? StrUtil.equals(localDebug, metaData) : StrUtil.isEmpty(metaData);

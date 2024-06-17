@@ -23,9 +23,10 @@ public class CorsFilter implements WebFilter, Ordered {
 
     private static final String MAX_AGE = "3600L";
     private static final String METHODS ="POST, GET, PUT, OPTIONS, DELETE";
+    // nginx默认没开启支持下划线header传递，直接采用首字母大写
     private static final String HEADERS ="Origin, Cache-Control, No-Cache, Pragma, Access-Control-Max-Age,X-Requested-With, " +
             "X_Requested_With, Content-Type, Content-Disposition, Content-Length, Date, Accept,REQUEST_SOURCE,CLIENT_TYPE," +
-            "Authorization,Clienttype,Request-Source,User-Id,Requestsource,Local-debug";
+            "Authorization,Clienttype,Request-Source,User-Id,Requestsource,Localdebug";
 
     @Override
     public int getOrder() {
