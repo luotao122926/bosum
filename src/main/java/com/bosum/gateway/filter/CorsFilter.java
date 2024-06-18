@@ -19,8 +19,7 @@ import reactor.core.publisher.Mono;
  * @author ouyangzuhao
  */
 @Component
-//public class CorsFilter implements WebFilter, Ordered {
-public class CorsFilter implements WebFilter {
+public class CorsFilter implements WebFilter, Ordered {
 
     private static final String MAX_AGE = "3600L";
     private static final String METHODS ="POST, GET, PUT, OPTIONS, DELETE";
@@ -29,10 +28,10 @@ public class CorsFilter implements WebFilter {
             "X_Requested_With, Content-Type, Content-Disposition, Content-Length, Date, Accept,REQUEST_SOURCE,CLIENT_TYPE," +
             "Authorization,Clienttype,Request-Source,User-Id,Requestsource,Localdebug";
 
-//    @Override
-//    public int getOrder() {
-//        return -100;
-//    }
+    @Override
+    public int getOrder() {
+        return -100;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
