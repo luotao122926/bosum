@@ -35,3 +35,4 @@ spring:
             refresh: true
       discovery:
         namespace: @nacos.discovery.namespace@
+#        namespace: erp_zbb
