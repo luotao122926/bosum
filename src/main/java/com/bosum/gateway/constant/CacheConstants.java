@@ -58,4 +58,5 @@ public class CacheConstants
     public static final String SYS_LOGIN_BLACKIPLIST = SYS_CONFIG_KEY + "sys.login.blackIPList";
 
     public static final Integer TOKEN_EXPIRATION_CODE = 5006;
+    public static final Integer TOKEN_NULL = 5008;
 }
